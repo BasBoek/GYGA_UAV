@@ -39,7 +39,14 @@ df_fi$FrProd_FrYr          <- NULL
 df_fi_trt$Fr_Yr            <- df_fi_trt$FrProd_FrYr
 df_fi_trt$FrProd_FrYr      <- NULL
 
-names(df_ind)
+# Rename variable
+df_ind$DW_prod             <- df_ind$Pa_Tot_kg_prod
+df_ind$Pa_Tot_kg_prod      <- NULL
+df_fi$DW_prod              <- df_fi$Pa_Tot_kg_prod
+df_fi$Pa_Tot_kg_prod       <- NULL
+df_fi_trt$DW_prod          <- df_fi_trt$Pa_Tot_kg_prod
+df_fi_trt$Pa_Tot_kg_prod   <- NULL
+
 
 ############################################################
 ####    CALCULATE IN_FIELD CORRELATIONS AND P-VALUES    ####
@@ -126,10 +133,14 @@ p_calc_ind <- function(data, VOIs, VIs){
   return(p_val)
   
 }
-names(df_ind)
+
 # Calculate correlation plots
-VOIs_inf <- c("N", "P", "K", "Mg", "Ca", "B", "RL", "LA_F", "Fr_Yr")
-VOIs_inf <- c("N_Lf_Fr_kg", "P_Lf_Fr_kg", "K_Lf_Fr_kg", "Mg_Lf_Fr_kg", "Ca_Lf_Fr_kg", "RL", "LA_F", "Fr_Tot_kg", "Fr_Yr")
+VOIs_inf_pc    <- c("N", "P", "K", "Mg", "Ca", "B")
+VOIs_inf_kg    <- c("N_Tot_Fr_kg",  "P_Tot_Fr_kg",  "K_Tot_Fr_kg",  "Mg_Tot_Fr_kg",  "Ca_Tot_Fr_kg",  "Fr_Tot_kg") # Leaflets
+# VOIs_inf_kg    <- c("N_Fr_Tot_kg", "P_Fr_Tot_kg", "K_Fr_Tot_kg", "Mg_Fr_Tot_kg", "Ca_Fr_Tot_kg", "Fr_Tot_kg") # Rachis + Petiole + Leaflets
+VOIs_inf_prod  <- c("N_Pa_Tot_kg_prod",  "P_Pa_Tot_kg_prod",  "K_Pa_Tot_kg_prod",  "Mg_Pa_Tot_kg_prod",  "Ca_Pa_Tot_kg_prod", "DW_prod")
+VOIs_inf_pf    <- c("RL", "LA_F", "DW_prod")
+
 #VIs0     <- c("NDVI", "NDRE", "WDRVI", "MSAVI", "NRED", "NGRN", "NNIR")
 VIs0     <- c("NDVI", "NDRE", "WDRVI", "MSAVI")
 VIs1     <- c("WDRVI", "NWWDRVI", "GWWDRVI", "WDRVI_LNSY", "WDRVI_LYSN", "WDRVI_LNSN")
@@ -164,33 +175,23 @@ create_corplot_PR_FI <- function(df_ind, VOIs, VIs, PR_FIs, TYPE="full"){
   return(gg)
 }
 
-VIs_all_inf       <- create_corplot_PR_FI(df_ind, VOIs_inf, VIs0, PR_FIs)
-# pix_man_WDRVI <- create_corplot_PR_FI(df_ind, VOIs_inf, VIs1, PR_FIs)
-# pix_man_NDRE  <- create_corplot_PR_FI(df_ind, VOIs_inf, VIs2, PR_FIs)
-# pix_man_both  <- create_corplot_PR_FI(df_ind, VOIs_inf, c(VIs1, VIs2), PR_FIs)
-# shapes_WDRVI  <- create_corplot_PR_FI(df_ind, VOIs_inf, VIs3, PR_FIs)
-# shapes_NDRE   <- create_corplot_PR_FI(df_ind, VOIs_inf, VIs4, PR_FIs)
-# shapes_both   <- create_corplot_PR_FI(df_ind, VOIs_inf, c(VIs3, VIs4), PR_FIs)
-WDRVI_all     <- create_corplot_PR_FI(df_ind, VOIs_inf, c(VIs1, VIs3), PR_FIs)
-NDRE_all      <- create_corplot_PR_FI(df_ind, VOIs_inf, c(VIs2, VIs4), PR_FIs)
+#pdf("../Data/3_Output/18_Correlation_plots.pdf")
+VIs_all_inf   <- create_corplot_PR_FI(df_ind, c(VOIs_inf_pc, VOIs_inf_kg, VOIs_inf_pf), VIs0, PR_FIs)
+# VIs_all_inf_kg   <- create_corplot_PR_FI(df_ind, c(VOIs_inf_kg, VOIs_inf_pf), VIs0, PR_FIs)
+# VIs_all_inf_prod <- create_corplot_PR_FI(df_ind, VOIs_inf_prod, VIs0, PR_FIs)
 
+WDRVI_all     <- create_corplot_PR_FI(df_ind, c(VOIs_inf_pc, VOIs_inf_kg, VOIs_inf_pf), c(VIs1, VIs3), PR_FIs)
+NDRE_all      <- create_corplot_PR_FI(df_ind, c(VOIs_inf_pc, VOIs_inf_kg, VOIs_inf_pf), c(VIs2, VIs4), PR_FIs)
 
+#dev.off()
 
-#####################################
-#### EXAMPLES BASED ON RESULTS   ####
-#####################################
+####################################################
+#### EXAMPLES BASED ON RESULTS - CONCENTRATIONS  ###
+####################################################
 
 sel <- df_ind[is.na(df_ind$N) == F,]
 
-ggplot(sel) +
-  geom_smooth(aes(x=NDRE/10000, y=N ), formula=y~x, color="black", method="lm", se = T) +
-  geom_point(aes(x=NDRE/10000, y=N, color = TRT), alpha=0.5, size=2, na.rm=T) +
-  scale_color_manual(values=c("#0088FF", "#FF9922")) +
-  labs(color='Treatment') + ylab("N (%)") + xlab("NDRE") +
-  facet_wrap(~PR_FI) +
-  theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
-
-# KEY FIGURE 1
+# KEY FIGURE 1 - Concentrations
 ggplot(sel) + 
   geom_smooth(aes(x=NDRE/10000, y=N ), formula=y~x, color="black", method="lm", se = T) +
   geom_point(aes(x=NDRE/10000, y=N, color = as.character(def_tot)), alpha=0.8, size=1.75, na.rm=T) +
@@ -199,38 +200,62 @@ ggplot(sel) +
   facet_wrap(~PR_FI) + 
   theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
 
-# ggplot(sel) + 
+# KEY FIGURE 1 - Amounts
+ggplot(sel) + 
+  geom_smooth(aes(x=NDRE/10000, y=N_Tot_Fr_kg ), formula=y~x, color="black", method="lm", se = T) +
+  geom_point(aes(x=NDRE/10000, y=N_Tot_Fr_kg, color = as.character(def_tot)), alpha=0.8, size=1.75, na.rm=T) +
+  labs(color='Limited (#)') + ylab("N (kg / 17th frond)") + xlab("NDRE") +
+  scale_color_viridis(direction = -1, begin=0.08, discrete = T, end=1) +
+  facet_wrap(~PR_FI) + 
+  theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
+
+# # Other figures
+# ggplot(sel) +
+#   geom_smooth(aes(x=NDRE/10000, y=N ), formula=y~x, color="black", method="lm", se = T) +
+#   geom_point(aes(x=NDRE/10000, y=N, color = TRT), alpha=0.5, size=2, na.rm=T) +
+#   scale_color_manual(values=c("#0088FF", "#FF9922")) +
+#   labs(color='Treatment') + ylab("N (%)") + xlab("NDRE") +
+#   facet_wrap(~PR_FI) +
+#   theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
+# 
+# ggplot(sel) +
 #   geom_smooth(aes(x=NDRE/10000, y=N ), formula=y~x, color="black", method="lm", se = T) +
 #   geom_point(aes(x=NDRE/10000, y=N, shape=TRT, color = as.character(def_tot)), alpha=0.8, size=1.75, na.rm=T) +
 #   labs(color='Limited (#)', shape="Treatment") + ylab("N (%)") + xlab("NDRE") +
 #   scale_color_viridis(direction = -1, begin=0.08, discrete = T, end=1) +
-#   facet_wrap(~PR_FI) + 
+#   facet_wrap(~PR_FI) +
+#   theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
+# 
+# ggplot(sel) +
+#   geom_smooth(aes(x=NDRE/10000, y=P ), formula=y~x, color="black", method="lm", se = T) +
+#   geom_point(aes(x=NDRE/10000, y=P, shape=TRT, color = as.character(def_tot)), alpha=0.8, size=1.75, na.rm=T) +
+#   labs(color='Limited (#)', shape="Treatment") + ylab("P (%)") + xlab("NDRE") +
+#   scale_color_viridis(direction = -1, begin=0.08, discrete = T, end=1) +
+#   facet_wrap(~PR_FI) +
+#   theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
+# 
+# ggplot(sel) +
+#   geom_smooth(aes(x=NDRE/10000, y=K ), formula=y~x, color="black", method="lm", se = T) +
+#   geom_point(aes(x=NDRE/10000, y=K, shape=TRT, color = as.character(def_tot)), alpha=0.8, size=1.75, na.rm=T) +
+#   labs(color='Limited (#)', shape="Treatment") + ylab("K (%)") + xlab("NDRE") +
+#   scale_color_viridis(direction = -1, begin=0.08, discrete = T, end=1) +
+#   facet_wrap(~PR_FI) +
+#   theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
+# 
+# ggplot(sel) +
+#   geom_smooth(aes(x=NDRE/10000, y=LA_F ), formula=y~x, color="black", method="lm", se = T) +
+#   geom_point(aes(x=NDRE/10000, y=LA_F, shape=TRT, color = as.character(def_tot)), alpha=0.8, size=2, na.rm=T) +
+#   labs(color='Limited (#)', shape="Treatment") + ylab(bquote("Leaf area / frond  ("~m^2~")")) + xlab("NDRE") +
+#   scale_color_viridis(direction = -1, begin=0.08, discrete = T, end=1) +
+#   facet_wrap(~PR_FI) + #, nrow = 4,  ncol = 3, scales = "fixed") +
 #   theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
 
-
 ggplot(sel) + 
-  geom_smooth(aes(x=NDRE/10000, y=P ), formula=y~x, color="black", method="lm", se = T) +
-  geom_point(aes(x=NDRE/10000, y=P, shape=TRT, color = as.character(def_tot)), alpha=0.8, size=1.75, na.rm=T) +
-  labs(color='Limited (#)', shape="Treatment") + ylab("P (%)") + xlab("NDRE") +
-  scale_color_viridis(direction = -1, begin=0.08, discrete = T, end=1) +
+  geom_smooth(aes(x=def_tot, y=N ), formula=y~x, color="black", method="lm", se = T) +
+  geom_point(aes(x=def_tot, y=N, color = NDRE/10000), alpha=0.8, size=1.75, na.rm=T) +
+  labs(color='NDRE') + ylab("N (%)") + xlab("Limited (#)") +
+  scale_color_viridis(direction = 1, begin=0.08, discrete = F, end=1) +
   facet_wrap(~PR_FI) + 
-  theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
-
-ggplot(sel) + 
-  geom_smooth(aes(x=NDRE/10000, y=K ), formula=y~x, color="black", method="lm", se = T) +
-  geom_point(aes(x=NDRE/10000, y=K, shape=TRT, color = as.character(def_tot)), alpha=0.8, size=1.75, na.rm=T) +
-  labs(color='Limited (#)', shape="Treatment") + ylab("K (%)") + xlab("NDRE") +
-  scale_color_viridis(direction = -1, begin=0.08, discrete = T, end=1) +
-  facet_wrap(~PR_FI) + 
-  theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
-
-# KEY FIGURE 2
-ggplot(sel) + 
-  geom_smooth(aes(x=NDRE/10000, y=LA_F ), formula=y~x, color="black", method="lm", se = T) +
-  geom_point(aes(x=NDRE/10000, y=LA_F, shape=TRT, color = as.character(def_tot)), alpha=0.8, size=2, na.rm=T) +
-  labs(color='Limited (#)', shape="Treatment") + ylab(bquote("Leaf area / frond  ("~m^2~")")) + xlab("NDRE") +
-  scale_color_viridis(direction = -1, begin=0.08, discrete = T, end=1) +
-  facet_wrap(~PR_FI) + #, nrow = 4,  ncol = 3, scales = "fixed") + 
   theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
 
 
@@ -239,7 +264,7 @@ ggplot(sel) +
 ############################################################
 
 # Calculate correlation plots
-VOIs_afi     <- c("N_reg_Lf", "P_reg_Lf", "K_reg_Lf", "Mg_reg_Lf", "Ca_reg_Lf", "RL", "LA_F", "Fr_Yr")
+VOIs_afi_pc  <- c("N_reg_Lf", "P_reg_Lf", "K_reg_Lf", "Mg_reg_Lf", "Ca_reg_Lf")
 
 
 VIs  <- VIs1
@@ -308,10 +333,15 @@ create_corplot_across <- function(df, VOIs, VIs, TYPE="full"){
   r_all <- p_r_calc_fi(df, VOIs, VIs)[[1]] # When CK_F1 is gone, all is insignificamt
   p_all <- p_r_calc_fi(df, VOIs, VIs)[[2]] # When CK_F1 is gone, all is insignificant
   
-  colnames(r_all) <- gsub("_reg_Lf", "", colnames(r_all))
-  colnames(p_all) <- gsub("_reg_Lf", "", colnames(p_all))
-  rownames(r_all) <- gsub("_reg_Lf", "", rownames(r_all))
-  rownames(p_all) <- gsub("_reg_Lf", "", rownames(p_all))
+  colnames(r_all) <- gsub("_reg_Lf", " (%)", colnames(r_all))
+  colnames(p_all) <- gsub("_reg_Lf", " (%)", colnames(p_all))
+  rownames(r_all) <- gsub("_reg_Lf", " (%)", rownames(r_all))
+  rownames(p_all) <- gsub("_reg_Lf", " (%)", rownames(p_all))
+  
+  colnames(r_all) <- gsub("_Tot_Fr_kg", " (kg)", colnames(r_all))
+  colnames(p_all) <- gsub("_Tot_Fr_kg", " (kg)", colnames(p_all))
+  rownames(r_all) <- gsub("_Tot_Fr_kg", " (kg)", rownames(r_all))
+  rownames(p_all) <- gsub("_Tot_Fr_kg", " (kg)", rownames(p_all))
   
   
   test <- p_all
@@ -323,14 +353,14 @@ create_corplot_across <- function(df, VOIs, VIs, TYPE="full"){
              hc.order = F,
              lab = T,
              type = TYPE,
-             lab_size = test,
-             #lab_size = 3,
+             #lab_size = test,
+             lab_size = 3,
              outline.color = "#777777",
              colors = c("blue", "white", "red"),
              tl.cex = 9,
              tl.srt = 90,
              p.mat=p_all,
-             sig.level=0.1,
+             sig.level=0.05,
              pch = 19, #or 21
              pch.cex = 9,
              pch.col = "#999999",
@@ -341,25 +371,26 @@ create_corplot_across <- function(df, VOIs, VIs, TYPE="full"){
 }
 
 
-VIs_all_acr      <- create_corplot_across(df_fi, VOIs_afi, VIs0)
+VIs_all_acr      <- create_corplot_across(df_fi, c(VOIs_afi_pc, VOIs_inf_kg, VOIs_inf_pf), VIs0)
+
 # pix_man_WDRVI <- create_corplot_across(df_fi, VOIs_afi, VIs1)
 # pix_man_NDRE  <- create_corplot_across(df_fi, VOIs_afi, VIs2)
 # pix_man_both  <- create_corplot_across(df_fi, VOIs_afi, c(VIs1, VIs2))
 # shapes_WDRVI  <- create_corplot_across(df_fi, VOIs_afi, VIs3)
 # shapes_NDRE   <- create_corplot_across(df_fi, VOIs_afi, VIs4)
 # shapes_both   <- create_corplot_across(df_fi, VOIs_afi, c(VIs3, VIs4))
-WDRVI_all        <- create_corplot_across(df_fi, VOIs_afi, c(VIs1, VIs3))
-NDRE_all         <- create_corplot_across(df_fi, VOIs_afi, c(VIs2, VIs4))
+WDRVI_all        <- create_corplot_across(df_fi, c(VOIs_afi_pc, VOIs_inf_kg, VOIs_inf_pf), c(VIs1, VIs3))
+NDRE_all         <- create_corplot_across(df_fi, c(VOIs_afi_pc, VOIs_inf_kg, VOIs_inf_pf), c(VIs2, VIs4))
 
-# Without CK_F1
-WDRVI_all_19     <- create_corplot_across(df_fi[df_fi$PR_FI != "CK_F1",], VOIs_afi, c(VIs1, VIs3))
-NDRE_all_19      <- create_corplot_across(df_fi[df_fi$PR_FI != "CK_F1",], VOIs_afi, c(VIs2, VIs4))
+# # Without CK_F1
+# WDRVI_all_19     <- create_corplot_across(df_fi[df_fi$PR_FI != "CK_F1",], c(VOIs_afi_pc, VOIs_afi_kg), c(VIs1, VIs3))
+# NDRE_all_19      <- create_corplot_across(df_fi[df_fi$PR_FI != "CK_F1",], c(VOIs_afi_pc, VOIs_afi_kg), c(VIs2, VIs4))
 
-# 
-# create_corplot_across(df_fi, 
-#                       c("N_reg_Lf",  "P_reg_Lf", "K_reg_Lf", "RL", "LA_F", "Fr_Yr"), 
-#                       c("N_reg_Lf",  "P_reg_Lf", "K_reg_Lf", "RL", "LA_F", "Fr_Yr"),
-#                       TYPE="lower")
+
+create_corplot_across(df_fi,
+   c("N_reg_Lf",  "P_reg_Lf", "K_reg_Lf", "N_Tot_Fr_kg", "P_Tot_Fr_kg", "K_Tot_Fr_kg", "RL", "LA_F", "DW_prod"),
+   c("N_reg_Lf",  "P_reg_Lf", "K_reg_Lf", "N_Tot_Fr_kg", "P_Tot_Fr_kg", "K_Tot_Fr_kg", "RL", "LA_F", "DW_prod"),
+   TYPE="lower")
 
 ############################################################
 #### EXAMPLES BASED ON RESULTS   ####
@@ -474,6 +505,17 @@ summary(lm(P_reg_Lf ~ WDRVI + def_reg_tot, df_fi))
 summary(lm(WDRVI    ~ P_reg_Lf + log(def_reg_tot), df_fi))   # Everything significant
 summary(lm(P_reg_Lf ~ WDRVI, df_fi[df_fi$def_reg_tot > 2,]))
 
+ggplot(df_fi) + 
+  geom_smooth(aes(x=WDRVI/1000, y=P_reg_Lf), formula=y~x, color="black", alpha=0.15, method="lm", se = T) +
+  geom_point(aes(x=WDRVI/1000, y=P_reg_Lf, color=as.character(def_reg_tot), size=P_Pa_Tot_kg_prod), alpha=0.9, na.rm=T) +
+  geom_text_repel(aes(x=WDRVI/1000, y=P_reg_Lf, label=PR_FI), direction = "y" , hjust=1, cex=3, alpha = 0.5, force = 0.1, force_pull = 2) +  
+  ylab("P concentration (%)") + xlab("WDRVI") + 
+  labs(size="kg DW / year", color="# Limited") + 
+  # xlim(  c( 0, 0.5 ) ) + ylim(c(0.13, 0.18)) +
+  scale_color_viridis(direction = -1, begin=0, end=0.98,discrete = T, ) +
+  theme_bw() 
+
+
 # KEY FIGURE 2 - Indeed, it's all connected (And reflected in Fronds / year)
 ggplot(df_fi) + 
   geom_smooth(aes(x=N_reg_Lf, y=P_reg_Lf), formula=y~x, color="black", alpha=0.15, method="lm", se = T) +
@@ -487,8 +529,11 @@ ggplot(df_fi) +
 
 summary(lm(df_fi$N_reg_Lf ~ df_fi$P_reg_Lf))
 
+
+
+
 ##################################################################
-##### SHOW WHAT CAUSES DIFFERENCE IN QUALITY OF PREDICTION #######
+##### SHOW VARIATION CAUSES DIFFERENCE IN QUALITY OF PREDICTION #######
 ##################################################################
 
 # Same function, but now averaging r's over PR_FI per vegetation index
@@ -529,20 +574,25 @@ r_calc_FIELD <- function(data, VOIs, VIs, fields){
   return(new_df)
 }
 
-# Add in-field nutrient deficiency variation
+# Add in-field nutrient deficiency variation - concentrations
+######################################################################
+
+# Calculate variance per field
 temp             <- aggregator(df_ind, "def_tot", c("PR_FI"), "sd")
 temp             <- na.omit(temp)
 temp$var_def_tot <- temp$def_tot^2
 temp$def_tot     <- NULL
 temp$Function    <- NULL
 
-test1            <- r_calc_FIELD(df_ind, VOIs_inf, VIs0, unique(temp$PR_FI))
+variables        <- c("N", "P", "K", "Mg", "Ca", "B", "RL", "LA_F", "DW_prod")
+
+# Calculate Pearson's r for every combination
+test1            <- r_calc_FIELD(df_ind, variables, VIs0, unique(temp$PR_FI))
 test2            <- test1[test1$var1=="NDRE",]
 test3            <- merge(test2, temp, by="PR_FI")
-test4            <- transform(test3, var2=factor(var2, levels=c("N", "P", "K", "Mg", "Ca", "B", "RL", "LA_F", "Fr_Yr") ) )
+test4            <- transform(test3, var2=factor(var2, levels=variables ) )
 rm(temp, test1, test2, test3)
 
-# Relation variation nutrient deficiency and correlation quality
 ggplot(test4) + 
   geom_smooth(aes(x=var_def_tot, y=r ), formula=y~x, color="black", method="lm", se = T) +
   geom_point(aes(x=var_def_tot, y=r), alpha=0.8, size=1.75, na.rm=T) +
@@ -559,7 +609,7 @@ summary(lm(r ~ var_def_tot, test4[test4$var2 == "Ca",]))$r.squared
 summary(lm(r ~ var_def_tot, test4[test4$var2 == "B",]))$r.squared
 summary(lm(r ~ var_def_tot, test4[test4$var2 == "RL",]))$r.squared
 summary(lm(r ~ var_def_tot, test4[test4$var2 == "LA_F",]))$r.squared
-summary(lm(r ~ var_def_tot, test4[test4$var2 == "Fr_Yr",]))$r.squared
+summary(lm(r ~ var_def_tot, test4[test4$var2 == "DW_prod",]))$r.squared
 
 summary(lm(r ~ var_def_tot, test4[test4$var2 == "N",]))$coefficients[2,4]
 summary(lm(r ~ var_def_tot, test4[test4$var2 == "P",]))$coefficients[2,4]
@@ -569,21 +619,35 @@ summary(lm(r ~ var_def_tot, test4[test4$var2 == "Ca",]))$coefficients[2,4]
 summary(lm(r ~ var_def_tot, test4[test4$var2 == "B",]))$coefficients[2,4]
 summary(lm(r ~ var_def_tot, test4[test4$var2 == "RL",]))$coefficients[2,4]
 summary(lm(r ~ var_def_tot, test4[test4$var2 == "LA_F",]))$coefficients[2,4]
-summary(lm(r ~ var_def_tot, test4[test4$var2 == "Fr_Yr",]))$coefficients[2,4]
+summary(lm(r ~ var_def_tot, test4[test4$var2 == "DW_prod",]))$coefficients[2,4]
 
-# blub0 <- aggregator(df_ind, "P", "PR_FI", "sd") 
-# blub0 <- na.omit(blub0)
-# blub1 <- df_fi[,c("PR_FI", "P")]
-# blub2 <- merge(blub1, test4, by="PR_FI")
-# blub3 <- blub2[blub2$var2 == "N",]
-# plot(blub3$P, blub3$r)
-# blub4 <- merge(blub0, blub3, by="PR_FI")
-# plot(blub4$P.x, blub4$r)
-# plot(blub4$P.y, blub4$r)
-# blub4$P <- blub4$P.x^2 / blub4$P.y
-# plot(blub4$P, blub4$r)
+
+# # Relation variation nutrient deficiency and correlation quality
+# 
+# variables        <- c("N_Tot_Fr_kg", "P_Tot_Fr_kg", "K_Tot_Fr_kg", "Mg_Tot_Fr_kg", "Ca_Tot_Fr_kg", "RL", "LA_F", "Pa_Tot_kg_prod")
+# 
+# # Calculate Pearson's r for every combination
+# test1            <- r_calc_FIELD(df_ind, variables, VIs0, unique(temp$PR_FI))
+# test2            <- test1[test1$var1=="NDRE",]
+# test3            <- merge(test2, temp, by="PR_FI")
+# test4            <- transform(test3, var2=factor(var2, levels=variables ) )
+# rm(temp, test1, test2, test3)
+# 
+# # Not useful
+# ggplot(test4) + 
+#   geom_smooth(aes(x=var_def_tot, y=r ), formula=y~x, color="black", method="lm", se = T) +
+#   geom_point(aes(x=var_def_tot, y=r), alpha=0.8, size=1.75, na.rm=T) +
+#   labs(color='Limited (#)', shape="Treatment") + ylab("Pearon's r") + xlab("# Limited nutrients - Variance") +
+#   facet_wrap(~var2) +
+#   geom_text_repel(aes(x=var_def_tot, y=r, label=PR_FI), direction = "y" , hjust=1, cex=3, alpha = 0.5, force = 0.1, force_pull = 2) +  
+#   theme_bw() + theme(strip.background = element_rect(fill="#FFFFDD"))
+
+
+
 
 # Nutrient limitations table
+######################################################################
+
 df_ind$nut_class <- NA
 df_ind$nut_class[df_ind$N_class == 1 & df_ind$P_class == 1 & df_ind$K_class == 1] <- "NPK_lim"
 df_ind$nut_class[df_ind$N_class == 1 & df_ind$P_class == 1 & df_ind$K_class == 0] <- "NP_lim"
@@ -620,7 +684,7 @@ ggplot(nuts, aes(x=classes_ordered, y=NDRE/10000)) +
 
 
 # WDRVI / NDRE discrepancy
-VI_difs <- aggregator(df_ind, c("NDRE", "WDRVI", "NIR_avg", "RE_avg", "TGF_Palm", "LA_F"), "PR_FI", "mean")
+VI_difs <- aggregator(df_ind, c("NDRE", "WDRVI", "NIR_avg", "RE_avg", "TGF_Palm", "LA_F", "RL", "DW_prod"), "PR_FI", "mean")
 VI_difs <- na.omit(VI_difs)
 
 ggplot(VI_difs) + 
@@ -630,6 +694,24 @@ ggplot(VI_difs) +
   scale_color_viridis(direction = 1, begin=0, end=0.98,discrete = F) +
   geom_text(aes(x=WDRVI/1000, y=NDRE/10000, label=PR_FI), hjust=0, vjust=-1, cex=3) + 
   theme_bw() 
+
+ggplot(VI_difs) + 
+  geom_smooth(aes(x=LA_F, y=NDRE/10000), formula=y~x, color="black", alpha=0.15, method="lm", se = T) +
+  geom_point(aes(x=LA_F, y=NDRE/10000, size=RE_avg/10000, color=DW_prod), alpha=0.9, na.rm=T) +
+  ylab("NDRE") + xlab("Leaf area / frond (m2)") + labs(size="Red Edge", color="Dw prod.") +
+  scale_color_viridis(direction = 1, begin=0, end=0.98,discrete = F) +
+  geom_text(aes(x=LA_F, y=NDRE/10000, label=PR_FI), hjust=0, vjust=-1, cex=3) + 
+  theme_bw() 
+
+ggplot(VI_difs) + 
+  geom_smooth(aes(x=LA_F, y=WDRVI/10000), formula=y~x, color="black", alpha=0.15, method="lm", se = T) +
+  geom_point(aes(x=LA_F, y=WDRVI/10000, size=RE_avg/10000, color=DW_prod), alpha=0.9, na.rm=T) +
+  ylab("WDRVI") + xlab("Leaf area / frond (m2)") + labs(size="Red Edge", color="Dw prod.") +
+  scale_color_viridis(direction = 1, begin=0, end=0.98,discrete = F) +
+  geom_text(aes(x=LA_F, y=WDRVI/10000, label=PR_FI), hjust=0, vjust=-1, cex=3) + 
+  theme_bw() 
+
+
 # RI_F6 and SS_F7 causing this
 
 

@@ -3,7 +3,12 @@
 # Goal: Inspect correlations between created spatial variables and ground measurement
 
 
-rm(list=ls())  # Clean script <- clean mind
+rm(list=ls()) 
+
+##########################################
+#### CHECK WD's & ADAPT IF NECESSARY #####
+##########################################
+
 
 # Set Script and Data wd
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # Works if you have a recent version of RStudio.
@@ -174,94 +179,4 @@ write.csv(stats,     paste0(wd, "2_Intermediate/05_statistics_per_field.csv"),  
 write.csv(stats_agg, paste0(wd, "2_Intermediate/05_statistics_per_parameter.csv"), row.names = F)
 
 
-# g1 <- ggplot(vars_FI) +
-#   ggtitle(paste0(FI, " - With outliers\n\n", VI), ) +
-#   theme_bw() +
-#   geom_smooth(aes(x=VOI, y=VI), size=1.5, linetype = "longdash", color="gray", formula=y~x, method=lm, se = F) +
-#   geom_point(aes(x=VOI, y=VI, color=TRT, size=factor(outlier, ordered=T))) +
-#   geom_text(aes(x=VOI, y=VI, label=NR, hjust = -0.2, vjust=-0.2), size=3, alpha=0.5) +
-#   xlab(VOI) +
-#   geom_smooth(aes(x=VOI, y=VI, color=TRT), formula=y~x, method=lm, se = F) +
-#   scale_color_manual(values = c("darkgreen", "orange")) +
-#   theme(legend.position="none", plot.title = element_text(size = 10, face = "bold"))
-# 
-# g2 <- ggplot(vars_FI_out) +
-#   ggtitle(paste0(FI, " - Without outliers\n\n", VI), ) +
-#   theme_bw() +
-#   geom_smooth(aes(x=VOI, y=VI), size=1.5, linetype = "longdash",color="gray", formula=y~x, method=lm, se = F) +
-#   geom_point(aes(x=VOI, y=VI, color=TRT, size=factor(outlier, ordered=T))) +
-#   geom_text(aes(x=VOI, y=VI, label=NR, hjust = -0.2, vjust=-0.2), size=3, alpha=0.5) +
-#   xlab(VOI) +
-#   geom_smooth(aes(x=VOI, y=VI, color=TRT), formula=y~x, method=lm, se = F) +
-#   scale_color_manual(values = c("darkgreen", "orange")) +
-#   theme(legend.position="none", plot.title = element_text(size = 10, face = "bold"))
-# 
-# ggarrange(g1, g2, ncol = 2, nrow = 1)
-
-
-# 1) Save r2 for all combinations
-# 2) Determine which VI is best on average
-# 3) Create above graphs for best VI
-# 4) Share results
-
-# 5) Only do circles, calculate donuts
-  # 0.0m - 0.5m
-  # 0.5m - 1.0m
-  # 1.0m - 1.5m
-  # 1.5m - 2.0m
-  # 2.0m - 2.5m
-  # 2.5m - 3.0m
-  # 3.0m - 3.5m
-
-# 6) Create 
-
-# 6) Try some other method for weighing pixels:
-  # Weighing differently (so determine what weight for what range for all)
-  # Weighing based on different thing besides shadows and shines (greenness)
-
-
-
-
-# 
-# 
-# 
-# test1 <- lm(NDVI___shape_1__0.5___weight_yes_cut10 ~ TRT + SPAD + N + P + K + B + Ca + Ash + LA_Palm + PR_FI, data = vars)
-# all1  <- ols_step_all_possible(test1)
-# #best1 <- lmer(NDVI___shape_1__0.5___weight_yes_cut10 ~ TRT + SPAD + LA_Palm + (1 | PR_FI), data = vars)
-# 
-# test2 <- lm(NDVI___shape_1__0.5___weight_yes_cut30 ~ TRT + SPAD + N + P + K + B + Ca + Ash + LA_Palm + PR_FI, data = vars)
-# all2  <- ols_step_all_possible(test2)
-# 
-# test3 <- lm(NDRE___shape_1__0.5___weight_yes_cut10 ~ TRT + SPAD + N + P + K + B + Ca + Ash + LA_Palm + PR_FI, data = vars)
-# all3  <- ols_step_all_possible(test3)
-# best3_lm  <- lm(NDRE___shape_1__0.5___weight_yes_cut10 ~ TRT + SPAD + PR_FI, data = vars)
-# best3_lm  <- lm(NDRE___shape_1__0.5___weight_yes_cut10 ~ TRT + SPAD + K + PR_FI, data = vars)
-# summary(best3_lm)
-# best3_mlm <- lmer(NDRE___shape_1__0.5___weight_yes_cut10 ~ TRT + SPAD + (1 | PR_FI), data = vars)
-# 
-# 
-# 
-# test4 <- lm(NDRE___shape_1__0.5___weight_yes_cut30 ~ TRT + SPAD + N + P + K + B + Ca + Ash + LA_Palm + PR_FI, data = vars)
-# all4  <- ols_step_all_possible(test4)
-# 
-# names(VI)
-# 
-# test <- lm(N ~ TRT + SPAD + P + K + B + Ca + Ash + LA_Palm + NDRE___shape_1__0.5___weight_yes_cut30 + PR_FI, data = vars)
-# summary(test)
-# 
-# test <- vars[vars$PR_FI == "JB_F6",]
-# plot(test$N, test$NDRE___shape_1.5__0.5___weight_no_cut10, col=as.factor(test$TRT))
-# lm_test <- lm(NDRE___shape_1.5__0.5___weight_no_cut10 ~ N, data = test)
-# test$NDRE___shape_1.5__0.5___weight_no_cut10 - 
-# 
-# sd(lm_test$residuals)
-# 
-# abline(lm_test, as.factor(test$TRT))
-# 
-# 
-# 
-# # plot(test$N[test$TRT=="BMP"], test$NDRE___shape_1__0.5___weight_no_cut30[test$TRT=="BMP"])
-# # points(test$N[test$TRT=="TRT"], test$NDRE___shape_1__0.5___weight_no_cut30[test$TRT=="TRT"])
-# 
-# unique(vars$PR_FI)
 

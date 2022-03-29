@@ -1,8 +1,13 @@
 # Bastiaen Boekelo, March 2021
 # Nebraska project - UAV and Oil Palm Nutrients
-# Goal: Create zonal statistics per tree
+# Goal: Create zonal statistics per tree and write .csv's to 2_Intermediate folder
 
-rm(list=ls())    # Clean script, clean head.
+##########################################
+#### CHECK WD's & ADAPT IF NECESSARY #####
+##########################################
+
+
+rm(list=ls()) 
 
 # Set Script wd
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # Works if you have a recent version of RStudio.
@@ -14,13 +19,12 @@ library(MASS)    # The following objects are masked from 'package:raster': area,
 source("functions/global_variables.R")
 source("functions/03_zonal_stats_tree.R")
 
-buffers <- c(0.5, 1, 1.5, 2, 2.5)
+buffers   <- c(0.5, 1, 1.5, 2, 2.5)
 
 all_palms <- readOGR(paste0(wd, "2_Intermediate"), "03_palm_centerpoints")
 combis    <- unique(all_palms@data$PR_FI)
 combis    <- combis[grepl("CK", combis)] # Remove CK for mismatch
 
-# combis    <- combis[grepl("F1", combis)] 
 
 for(COMBI in 1:length(combis)){
   

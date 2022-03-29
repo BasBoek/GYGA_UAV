@@ -128,21 +128,6 @@ df_nu$nut_lim[df_nu$N_class > trh & df_nu$P_class > trh & df_nu$K_class > trh] <
 
 
 
-# temp <- df_nu[,c("N_class", "P_class", "K_class", "Mg_class", "Ca_class", "B_class")] 
-# temp[temp == 8] <- "D"
-# temp[temp == 4] <- "L"
-# temp[temp == 2] <- "O"
-# temp[temp == 1] <- "H"
-# temp[temp == 0] <- "E"
-# df_nu[,c("N_class", "P_class", "K_class", "Mg_class", "Ca_class", "B_class")]  <- temp
-# 
-# neworder <- c("D", "L", "O", "H", "E")
-# temp     <- df_nu
-# temp    <- arrange(transform(temp, N_class = factor(N_class, levels=neworder)), temp)
-
-
-
-
 # Read SPAD measurements
 df_sp          <- read.csv(paste0(wd, "1_Input/Onground/sheet2_Intensive sampling 210310__SPAD_Measurement_Year_2.csv"), stringsAsFactors=F)
 df_sp$DOM_spad <- df_sp$DOM

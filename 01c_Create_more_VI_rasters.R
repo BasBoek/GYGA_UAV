@@ -10,7 +10,7 @@
 library(raster)
 library(rgdal)
 
-rm(list=ls())  # Clean script <- clean mind
+rm(list=ls())  
 
 # Set Script and Data wd
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # Works if you have a recent version of RStudio.
