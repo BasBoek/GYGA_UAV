@@ -4,7 +4,11 @@
 
 library(raster)
 
-rm(list=ls())  # Clean script <- clean mind
+##########################################
+#### CHECK WD's & ADAPT IF NECESSARY #####
+##########################################
+
+rm(list=ls())  
 
 # Set Script and Data wd
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # Works if you have a recent version of RStudio.
@@ -13,6 +17,7 @@ wd <- "C:/Users/boeke015/OneDrive - Wageningen University & Research/UAV_Palm/Da
 ras_files  <- list.files(paste0(wd, "2_Intermediate"), pattern = ".tif$")
 ras_files  <- ras_files[grepl("01_Ortho_", ras_files)]
 
+# In order to reduce file size, mask the rasters to the buffer-around-the-centerpoins only
 for(FILENR in 1:length(ras_files)){
   ras_name <- ras_files[FILENR]
   ras <- stack(paste0(wd, "2_Intermediate/", ras_name))
