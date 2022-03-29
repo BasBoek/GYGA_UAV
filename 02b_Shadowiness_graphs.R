@@ -2,6 +2,12 @@
 # Nebraska project - UAV and Oil Palm Nutrients
 # Goal: Visualize / inspect how shadowiness and shininess influence the VI response.
 
+
+##########################################
+#### CHECK WD's & ADAPT IF NECESSARY #####
+##########################################
+
+
 rm(list=ls())  # Clean script <- clean mind
 
 # Set Script and data wd
@@ -12,9 +18,6 @@ library(ggplot2)
 source("functions/aggregator.R")
 source("functions/make_gradient.R")
 source("functions/global_variables.R")
-
-
-# Set Data wd
 
 pdf(paste0(wd, "3_Output/02_Shadowiness_Shininess_Fields.pdf"), width=15, height=10)
 
@@ -149,18 +152,6 @@ for(VI in VIs){
 }
 
 dev.off()
-
-
-
-# 
-# ggplot(zonals) +
-#   # geom_bar( aes(x=barcenter , y=pix_cov), stat="identity", fill="darkgreen", width = zonals$barwidth-zonals$barwidth/10)+
-#   geom_line( aes(x=barcenter, y=pix_cov), size=1, colour="#001100") +
-#   theme_bw() + ylim(0, 0.2) +
-#   facet_wrap(~PR_FI) +
-#   ggtitle(paste0(VI, " - ", buf_dist, " m"))
-# 
-# 
 
 
 # Idea:

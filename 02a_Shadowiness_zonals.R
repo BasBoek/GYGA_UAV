@@ -2,6 +2,11 @@
 # Nebraska project - UAV and Oil Palm Nutrients
 # Goal: Create zonal statistics before visualization to inspect how shadowiness and shininess influence the VI response.
 
+
+##########################################
+#### CHECK WD's & ADAPT IF NECESSARY #####
+##########################################
+
 rm(list=ls())  # Clean script <- clean mind
 
 # Set Script and Data wd
@@ -33,28 +38,19 @@ for(COMBI in 1:length(combis)){
       print("preprocess rasters")
       
       # Input rasters
-      ortho   <- stack(paste0(wd, "2_Intermediate/", ortho_name))
-      NDRE    <- raster(paste0(wd, "2_Intermediate/", NDRE_name))
-      NDVI    <- raster(paste0(wd, "2_Intermediate/", NDVI_name))
+      ortho     <- stack(paste0(wd, "2_Intermediate/", ortho_name))
+      NDRE      <- raster(paste0(wd, "2_Intermediate/", NDRE_name))
+      NDVI      <- raster(paste0(wd, "2_Intermediate/", NDVI_name))
 
       # Preprocess mask raster
-      
       red_norm  <- ( ortho[[1]] - cellStats(ortho[[1]], "mean", na.rm=T) ) / cellStats(ortho[[1]], "sd", na.rm=T)
       NIR_norm  <- ( ortho[[5]] - cellStats(ortho[[5]], "mean", na.rm=T) ) / cellStats(ortho[[5]], "sd", na.rm=T)
       refl_avg  <- ( red_norm + NIR_norm ) / 2
       avg_pos   <- refl_avg - cellStats(refl_avg, "min", na.rm=T)
 
-      # # PREVENTING SCRIPT FROM CRASHING:
-      # NDRE@file@blockrows <- NDVI@file@blockrows
-      # NDRE@file@blockcols <- NDVI@file@blockcols
-      # 
-      # avg_pos@file@blockrows <- NDVI@file@blockrows
-      # avg_pos@file@blockcols <- NDVI@file@blockcols
-      # avg_pos@file@driver    <- NDVI@file@driver
-      
       # Input palm points
-      points      <- readOGR(paste0(wd, "2_Intermediate"), substr(points_name, 1, nchar(points_name)-4) )
-      points      <- spTransform(points, crs(ortho) )
+      points    <- readOGR(paste0(wd, "2_Intermediate"), substr(points_name, 1, nchar(points_name)-4) )
+      points    <- spTransform(points, crs(ortho) )
       
       ################
       ### ANALYSIS ###
@@ -78,14 +74,13 @@ for(COMBI in 1:length(combis)){
       }
       
     } else {
-      
       print(paste0(PR_FI, ": not complete?"))
-      
     } 
     
   } else {
     print(paste0(PR_FI, ": no input at all"))
   }
+  
 }
 
 

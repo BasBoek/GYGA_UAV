@@ -1,8 +1,16 @@
+# Bastiaen Boekelo, April 2021
+# Nebraska Project
+# Inspect some statistics 
+
+##########################################
+#### CHECK WD's & ADAPT IF NECESSARY #####
+##########################################
+
+
 library(raster)
 library(rasterpdf)
 
 dev.off(which = grDevices::dev.cur())
-
 rm(list=ls())  # Clean script <- clean mind
 
 # Set Script and Data wd
@@ -16,8 +24,6 @@ pdf(paste0(wd, "3_Output/01d_Stats_VIs_v2.pdf"))
 plot.new()
 
 PR_FI_files <- list.files(paste0(wd, "2_Intermediate"), pattern = ".tif$")
-# PR_FI <- "CK_F2"
-
 for(PR_FI in fields){
 
   print(PR_FI)
@@ -43,21 +49,6 @@ for(PR_FI in fields){
   plot(WDRVI)
   title(sel[7])
   
-  # test <- NDREG
-  # test[test < 250] <- NA
-  # plot(test)
-  
-  # plot.new()
-  # print("gg")
-  # hist(MSAVI, breaks=100, title(sel[1]))
-  # print("sfd")
-  # hist(NDRE, breaks=100,  title(sel[2]))
-  # hist(NDREG, breaks=100, title(sel[3]))
-  # hist(NDVI, breaks=100,  title(sel[4]))
-  # hist(NDVIG, breaks=100, title(sel[5]))
-  # print("ll")
-  # hist(WDRVI, breaks=100, title(sel[7]))
-  # 
 }
 
 dev.off()

@@ -3,9 +3,9 @@
 # Goal: Write single band rasters to intermediate folder
 
 
-      ##########################################
-      #### CHECK WD's & ADAPT IF NECESSARY #####
-      ##########################################
+##########################################
+#### CHECK WD's & ADAPT IF NECESSARY #####
+##########################################
 
       
 # Set Script and Data wd
