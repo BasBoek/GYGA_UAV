@@ -20,11 +20,7 @@ all_palms <- readOGR(paste0(wd, "2_Intermediate"), "03_palm_centerpoints")
 combis    <- unique(all_palms@data$PR_FI)
 combis    <- combis[grepl("CK", combis)] # Remove CK for mismatch
 
-
-
-combis    <- combis[grepl("F1", combis)] 
-
-
+# combis    <- combis[grepl("F1", combis)] 
 
 for(COMBI in 1:length(combis)){
   
@@ -47,7 +43,6 @@ for(COMBI in 1:length(combis)){
       NDVI    <- raster(paste0(wd, "2_Intermediate/", NDVI_name))
       
       # Preprocess mask raster
-      
       red_norm  <- ( ortho[[1]] - cellStats(ortho[[1]], "mean", na.rm=T) ) / cellStats(ortho[[1]], "sd", na.rm=T)
       NIR_norm  <- ( ortho[[5]] - cellStats(ortho[[5]], "mean", na.rm=T) ) / cellStats(ortho[[5]], "sd", na.rm=T)
       refl_avg  <- ( red_norm + NIR_norm ) / 2
